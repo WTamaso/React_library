@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import "./styles/App.scss";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -16,16 +17,14 @@ export default class Main extends Component {
     render() {
         return (
             <HashRouter>
-                <div>
-                    <Header/>
-                    <Content>
-                        <Route exact path="/" component={Home}/>
-                        <Route path="/comics" component={Comics}/>
-                        <Route path="/characters" component={Characters}/>
-                        <Route path="/Creators" component={Creators}/>
-                    </Content>
-                    <Footer/>
-                </div>
+                <Header/>
+                <Content>
+                    <Route exact path="/" component={Home}/>
+                    <Route path="/comics" component={Comics}/>
+                    <Route path="/characters" component={Characters}/>
+                    <Route path="/Creators" component={Creators}/>
+                </Content>
+                <Footer/>
             </HashRouter>
         );
     }
