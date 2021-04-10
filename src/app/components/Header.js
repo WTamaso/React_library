@@ -5,6 +5,7 @@ import {
 import "../styles/components/Header.scss";
 import {Col, Container, Row} from "react-bootstrap";
 import {Files, HouseFill, PeopleFill, PersonBadgeFill} from "react-bootstrap-icons";
+import logo from "../images/marvel-library-ext.png";
 
 export default class Header extends Component {
     render() {
@@ -13,7 +14,7 @@ export default class Header extends Component {
                 <Row>
                     <Col>
                         <h1>
-                            Marvel Library
+                            <img className="main-logo" src={logo} alt="Marvel Library logo" />
                         </h1>
                     </Col>
                     <Col>

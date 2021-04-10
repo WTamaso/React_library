@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import "../styles/components/Footer.scss"
 import {Col, Container, Row} from "react-bootstrap";
 
-export default class Content extends Component {
+export default class Creators extends Component {
     render() {
         return (
             <Container>
@@ -13,7 +13,7 @@ export default class Content extends Component {
                 </Row>
                 <Row>
                     <Col>
-                        ::)
+                        :)
                     </Col>
                 </Row>
             </Container>
