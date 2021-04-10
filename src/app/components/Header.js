@@ -1,10 +1,8 @@
 import React, {Component} from "react";
-import {
-    NavLink
-} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 import "../styles/components/Header.scss";
 import {Col, Container, Row} from "react-bootstrap";
-import {Files, HouseFill, PeopleFill, PersonBadgeFill} from "react-bootstrap-icons";
+import {Files} from "react-bootstrap-icons";
 import logo from "../images/marvel-library-ext.png";
 
 export default class Header extends Component {
@@ -20,17 +18,20 @@ export default class Header extends Component {
                     <Col>
                         <ul>
                             <li>
+                                <NavLink to="/"><Files/> Comics</NavLink>
+                            </li>
+                            {/*<li>
                                 <NavLink exact to="/" className="test"><HouseFill/> Home</NavLink>
                             </li>
                             <li>
                                 <NavLink to="/comics"><Files/> Comics</NavLink>
-                            </li>
-                            <li>
+                            </li>*/}
+                            {/*<li>
                                 <NavLink to="/characters"><PeopleFill/> Characters</NavLink>
                             </li>
                             <li>
                                 <NavLink to="/creators"><PersonBadgeFill/> Creators</NavLink>
-                            </li>
+                            </li>*/}
                         </ul>
                     </Col>
                 </Row>

@@ -1,10 +1,11 @@
-import React, {useEffect, useState, useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "../styles/components/Footer.scss"
-import {Button, ButtonGroup, Col, Container, Form, InputGroup, Row, ToggleButton} from "react-bootstrap";
+import {Button, ButtonGroup, Col, Container, Form, InputGroup, Pagination, Row, ToggleButton} from "react-bootstrap";
 import axios from "axios";
 import Loading from "../components/Loading";
 import Error from "../components/Error";
-import {Grid, Search, SortDownAlt, SortUp, ViewList, X} from "react-bootstrap-icons";
+import {Bookmarks, BookmarkX, Envelope, Grid, Search, SortDownAlt, SortUp, ViewList, X} from "react-bootstrap-icons";
+import Details from "../components/Details";
 
 export default function Comics() {
     const [loading, setLoading] = useState(true);
@@ -17,6 +18,8 @@ export default function Comics() {
     const [sortField, setSortField] = useState("title");
     const [search, setSearch] = useState();
     const [inputText, setInputText] = useState();
+    const [bookmarked, setBookmarked] = useState([]);
+    const [comicDetail, setComicDetail] = useState();
 
     const searchInput = useRef(null);
 
@@ -88,10 +91,101 @@ export default function Comics() {
     ]);
 
     useEffect(() => {
-        const timeOutId = setTimeout(() => setSearch(inputText), 500);
+        const timeOutId = setTimeout(() => {
+            setSearch(inputText);
+            setViewPage(1);
+        }, 1500);
         return () => clearTimeout(timeOutId);
     }, [inputText]);
 
+    function paginationControls() {
+        var pageCount = Math.ceil(content.total / content.limit);
+
+        var startPage, endPage;
+        if (pageCount <= 10) {
+            // less than 10 total pages so show all
+            startPage = 1;
+            endPage = pageCount;
+        } else {
+            // more than 10 total pages so calculate start and end pages
+            if (viewPage <= 6) {
+                startPage = 1;
+                endPage = 10;
+            } else if (viewPage + 4 >= pageCount) {
+                startPage = pageCount - 9;
+                endPage = pageCount;
+            } else {
+                startPage = viewPage - 5;
+                endPage = viewPage + 4;
+            }
+        }
+
+        // calculate start and end item indexes
+        var startIndex = (viewPage - 1) * content.limit;
+        var endIndex = Math.min(startIndex + content.limit - 1, content.total - 1);
+
+        // create an array of pages to ng-repeat in the pager control
+        var pages = [...Array((endPage + 1) - startPage).keys()].map(i => startPage + i);
+
+
+        return (<>
+            <Pagination.First key={-4} onClick={(e) => {
+                setViewPage(1)
+            }}/>
+            <Pagination.Prev key={-3} onClick={(e) => {
+                setViewPage(viewPage - 1 < 1 ? 1 : viewPage - 1)
+            }}/>
+            {pages.map((page, i) => <>
+                <Pagination.Item
+                    variant="danger"
+                    key={i}
+                    active={viewPage == page}
+                    onClick={(e) => {
+                        setViewPage(page)
+                    }}
+                >
+                    {page}
+                </Pagination.Item>
+            </>)}
+            <Pagination.Next key={-2} onClick={(e) => {
+                setViewPage(viewPage + 1 > pageCount ? pageCount : viewPage + 1)
+            }}/>
+            <Pagination.Last key={-1} onClick={(e) => {
+                setViewPage(pageCount)
+            }}/>
+        </>);
+    }
+
+    function openModal(item) {
+        setComicDetail(item);
+    }
+
+    function closeModal() {
+        setComicDetail(null);
+    }
+
+    function handleBookmark(checked, item) {
+        if (checked) {
+            //Add to bookmarked list
+            setBookmarked(bookmarked.concat([item]));
+            console.log("added: " + item.id); //TODO remove
+        } else {
+            //Remove from bookmarked list
+            setBookmarked(bookmarked.filter(function (rem) {
+                return rem.id !== item.id
+            }));
+            console.log("removed: " + item.id);
+        }
+        console.log(bookmarked);
+    }
+
+    function showEmailDialog() {
+
+    }
+
+    function showBookmarks() {
+
+    }
 
     return (
         <Container>
@@ -121,8 +215,8 @@ export default function Comics() {
                                 <Button
                                     variant="outline-secondary"
                                     onClick={() => {
-                                        // setSearch(null);
                                         setInputText("");
+                                        setViewPage(1);
                                     }}
                                 >
                                     <X/>
@@ -139,6 +233,7 @@ export default function Comics() {
                             as="select"
                             onChange={(e) => {
                                 setSortField(e.currentTarget.value);
+                                setViewPage(1);
                             }}
                             defaultValue="title"
                         >
@@ -150,11 +245,12 @@ export default function Comics() {
                             <ToggleButton
                                 type="radio"
                                 variant="outline-secondary"
-                                name="viewOption"
+                                name="sortOption"
                                 value={sortOrders[0].value}
                                 checked={sortOrders[0].value === sortOrder}
                                 onChange={(e) => {
                                     setSortOrder(e.currentTarget.value);
+                                    setViewPage(1);
                                 }}
                             >
                                 <SortDownAlt/>
@@ -162,11 +258,12 @@ export default function Comics() {
                             <ToggleButton
                                 type="radio"
                                 variant="outline-secondary"
-                                name="viewOption"
+                                name="sortOption"
                                 value={sortOrders[1].value}
                                 checked={sortOrders[1].value === sortOrder}
                                 onChange={(e) => {
                                     setSortOrder(e.currentTarget.value);
+                                    setViewPage(1);
                                 }}
                             >
                                 <SortUp/>
@@ -178,13 +275,15 @@ export default function Comics() {
                     <Form inline>
                         <Form.Label>View</Form.Label>
                         <Form.Control
+                            defaultValue="20"
                             size="sm"
                             as="select"
                             onChange={(e) => {
                                 setViewLimit(e.currentTarget.value);
+                                setViewPage(1);
                             }}
                         >
-                            <option selected>20</option>
+                            <option>20</option>
                             <option>40</option>
                             <option>60</option>
                             <option>80</option>
@@ -219,26 +318,64 @@ export default function Comics() {
                     </Form>
                 </Col>
             </Row>
-            <Row>
-                <Col>
-                    <p>Showing: {content?.offset || 0} - {(content?.offset || 0) + (content?.count || 0)} of {content?.total || 0}</p>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <ul className={viewMode == "grid" ? "grid-view" : "list-view"}>
-                        {content?.results ? content.results.map((comicItem, i) =>
-                            <li key={i}>
-                                <img src={comicItem.thumbnail.path + "." + comicItem.thumbnail.extension}
-                                     height="150px"/>
-                                <p>Title: {comicItem.title}</p>
-                                <p>Description: {comicItem.description}</p>
-                                <p>Page count: {comicItem.pageCount}</p>
-                            </li>
-                        ) : "No Comics"}
-                    </ul>
-                </Col>
-            </Row>
+            {content?.results && content.results.length > 0 ? <>
+                    <Row>
+                        <Col>
+                            <p>Showing: {content?.offset || 0} - {(content?.offset || 0) + (content?.count || 0)} of {content?.total || 0}</p>
+                        </Col>
+                        <Col>
+                            {bookmarked.length > 0 && <>
+                                <Button variant="warning" onClick={(e) => {setBookmarked([])}}>
+                                    <BookmarkX/>
+                                </Button>
+                                <Button variant="secondary" onClick={(e) => {showBookmarks()}}>
+                                    <Bookmarks/>&nbsp;{bookmarked.length}
+                                </Button>
+                                <Button variant="danger" onClick={(e) => {showEmailDialog()}}>
+                                    <Envelope/>&nbsp;Send
+                                </Button>
+                            </>}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Details show={!!comicDetail} callback={closeModal} item={comicDetail}/>
+                            <ul className={viewMode == "grid" ? "grid-view" : "list-view"}>
+                                {content.results.map((item, i) =>
+                                    <li key={i}>
+                                        <Form.Check variant="danger" aria-label="bookbark comic"
+                                                    checked={bookmarked.some((i) => item.id === i.id)} onChange={(e) => {
+                                            handleBookmark(e.currentTarget.checked, item);
+                                        }}/>
+                                        <img src={item.thumbnail.path + "." + item.thumbnail.extension}
+                                             height="150px"/>
+                                        <p>Title: {item.title}</p>
+                                        <p>Description: {item.description}</p>
+                                        <p>Page count: {item.pageCount}</p>
+                                        <Button
+                                            variant="danger"
+                                            onClick={(e) => {
+                                                openModal(item)
+                                            }}>Details</Button>
+                                    </li>
+                                )}
+                            </ul>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Pagination variant="danger">
+                                {paginationControls()}
+                            </Pagination>
+                        </Col>
+                    </Row>
+                </> :
+                <Row>
+                    <Col>
+                        <p>No results</p>
+                    </Col>
+                </Row>
+            }
         </Container>
     );
 }

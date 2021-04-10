@@ -1,0 +1,41 @@
+.details-backdrop {
+    display: flex;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+
+    &.modal-open {
+        display: flex;
+    }
+
+    &.modal-closed {
+        display: none;
+    }
+
+    .comic-modal {
+        display: flex;
+        position: relative;
+        background: white;
+        width: 90%;
+        padding: 20px;
+        margin: 0 auto;
+        flex-direction: column;
+
+        .close-container {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            z-index: 110;
+        }
+
+        .detail-title {
+            margin-right: 35px;
+        }
+    }
+}
